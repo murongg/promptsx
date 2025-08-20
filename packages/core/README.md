@@ -9,7 +9,7 @@
 
 ## 📚 Documentation
 
-**📖 [Full Documentation](https://promptx.dev)** - Complete guides, API reference, and examples
+**📖 [Full Documentation](https://promptsx.vercel.app/)** - Complete guides, API reference, and examples
 
 ## 🚀 Features
 
