@@ -1,7 +1,7 @@
 {
   "name": "@promptsx/core",
   "type": "module",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A flexible and extensible Prompt DSL for building AI prompts with templates, variables, chaining, and intelligent expansion.",
   "author": "MuRong <hi@mrong.me>",
   "license": "MIT",
