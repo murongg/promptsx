@@ -1,0 +1,39 @@
+{
+  "name": "@promptsx/core",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "A flexible and extensible Prompt DSL for building AI prompts with templates, variables, chaining, and intelligent expansion.",
+  "author": "MuRong <hi@mrong.me>",
+  "license": "MIT",
+  "homepage": "https://github.com/murongg/promptx#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/murongg/promptx.git"
+  },
+  "bugs": "https://github.com/murongg/promptx/issues",
+  "keywords": [
+    "prompt",
+    "ai",
+    "llm",
+    "template",
+    "dsl",
+    "typescript",
+    "zero-dependencies"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": "./dist/index.mjs"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "prepublishOnly": "nr build",
+    "start": "tsx src/index.ts"
+  }
+}
