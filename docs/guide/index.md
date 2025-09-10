@@ -19,14 +19,18 @@ PromptX is a flexible and extensible Prompt DSL for building AI prompts with tem
 ### Basic Usage
 
 ```typescript
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
-const prompt = P()
-  .system
-  .role('code-assistant', 'A helpful coding assistant')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('code-assistant', 'A helpful coding assistant')
   .content('You are an expert developer')
   .important('Always provide working code examples')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 
 console.log(prompt)
 ```
@@ -49,12 +53,13 @@ You are an expert developer
 ### Advanced Example
 
 ```typescript
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
-const prompt = P()
+const builder = P()
 
-prompt.system
-  .role('senior-developer', 'A senior software developer with 10+ years of experience')
+const systemNode = new PromptNode('system')
+systemNode
+  .setRole('senior-developer', 'A senior software developer with 10+ years of experience')
   .content('You specialize in {{language}} and {{framework}}')
   .var('language', 'TypeScript')
   .var('framework', 'React')
@@ -65,13 +70,16 @@ prompt.system
   .case('fullstack', 'Balance both considerations')
   .default('Apply general principles')
 
-prompt.user
+const userNode = new PromptNode('user')
+userNode
   .content('Create a {{componentName}} component')
   .var('componentName', 'UserProfile')
   .important('Follow accessibility guidelines')
   .example('// Example usage:\n<UserProfile />')
 
-const result = prompt.build()
+builder.nodes.push(systemNode)
+builder.nodes.push(userNode)
+const result = builder.build()
 ```
 
 **Output:**

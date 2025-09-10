@@ -19,12 +19,16 @@ export class PromptNode {
     this._role = role
   }
 
+  get role(): ChatMessage['role'] {
+    return this._role
+  }
+
   /**
    * @param name - The name of the role
    * @param description - The description of the role
    * @returns The prompt node
    */
-  role(name: string, description: string): this {
+  setRole(name: string, description: string): this {
     this._roleDefinition = { name, description }
     return this
   }

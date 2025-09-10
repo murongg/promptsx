@@ -22,33 +22,33 @@ yarn add @promptsx/core
 ### Import and Create
 
 ```typescript
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
 // Create a new prompt builder
-const prompt = P()
+const builder = P()
 ```
 
 **Output:**
 ```typescript
 PromptBuilder {
-  system: PromptNode { _role: 'system', ... },
-  user: PromptNode { _role: 'user', ... },
-  assistant: PromptNode { _role: 'assistant', ... }
+  nodes: []
 }
 ```
 
 ### Building System Messages
 
 ```typescript
-const prompt = P()
+const builder = P()
+const systemNode = new PromptNode('system')
 
-prompt.system
-  .role('assistant', 'A helpful AI assistant')
+systemNode
+  .setRole('assistant', 'A helpful AI assistant')
   .content('You help users with their questions')
   .important('Always be polite and helpful')
   .critical('Never provide harmful information')
 
-const systemMessage = prompt.system.build()
+builder.nodes.push(systemNode)
+const systemMessage = systemNode.build()
 ```
 
 **Output:**
@@ -67,12 +67,14 @@ Never provide harmful information
 ### Building User Messages
 
 ```typescript
-prompt.user
+const userNode = new PromptNode('user')
+userNode
   .content('Help me with {{topic}}')
   .var('topic', 'JavaScript programming')
   .example('// I need help with async/await')
 
-const userMessage = prompt.user.build()
+builder.nodes.push(userNode)
+const userMessage = userNode.build()
 ```
 
 **Output:**
@@ -85,7 +87,7 @@ const userMessage = prompt.user.build()
 ### Building Complete Prompts
 
 ```typescript
-const completePrompt = prompt.build()
+const completePrompt = builder.build()
 ```
 
 **Output:**
@@ -118,21 +120,25 @@ Never provide harmful information
 
 ```typescript
 import OpenAI from 'openai'
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
 const openai = new OpenAI()
-const prompt = P()
+const builder = P()
 
-prompt.system
-  .role('code-reviewer', 'An experienced code reviewer')
+const systemNode = new PromptNode('system')
+systemNode
+  .setRole('code-reviewer', 'An experienced code reviewer')
   .content('Review the following code for best practices')
   .important(['Check for security issues', 'Verify code quality'])
 
-prompt.user
+const userNode = new PromptNode('user')
+userNode
   .content('Review this code:\n```typescript\n{{code}}\n```')
   .var('code', 'function processData(data: any) { return data.process() }')
 
-const messages = prompt.build()
+builder.nodes.push(systemNode)
+builder.nodes.push(userNode)
+const messages = builder.build()
 
 const completion = await openai.chat.completions.create({
   model: 'gpt-4',
@@ -168,22 +174,27 @@ function processData(data: any) { return data.process() }
 
 ```typescript
 import Anthropic from '@anthropic-ai/sdk'
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
 const anthropic = new Anthropic()
-const prompt = P()
+const builder = P()
 
-prompt.system
-  .role('writing-assistant', 'A professional writing assistant')
+const systemNode = new PromptNode('system')
+systemNode
+  .setRole('writing-assistant', 'A professional writing assistant')
   .content('Help improve the following text')
   .important(['Maintain the original tone', 'Improve clarity'])
 
-prompt.user
+const userNode = new PromptNode('user')
+userNode
   .content('Improve this text: {{text}}')
   .var('text', 'The quick brown fox jumps over the lazy dog.')
 
-const systemPrompt = prompt.system.build()
-const userPrompt = prompt.user.build()
+builder.nodes.push(systemNode)
+builder.nodes.push(userNode)
+
+const systemPrompt = systemNode.build()
+const userPrompt = userNode.build()
 
 const message = await anthropic.messages.create({
   model: 'claude-3-sonnet-20240229',

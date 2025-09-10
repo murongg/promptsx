@@ -8,13 +8,11 @@ This page provides comprehensive documentation for all PromptX APIs, including c
 
 ### PromptBuilder
 
-The main class for building prompts with system, user, and assistant messages.
+The main class for building prompts with multiple nodes of different roles.
 
 ```typescript
 class PromptBuilder {
-  public system: PromptNode
-  public user: PromptNode
-  public assistant: PromptNode
+  public nodes: PromptNode[]
 
   build(): ChatMessage[]
 }
@@ -22,12 +20,17 @@ class PromptBuilder {
 
 **Example:**
 ```typescript
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
-const prompt = P()
-prompt.system.content('System message')
-prompt.user.content('User message')
-const result = prompt.build()
+const builder = P()
+const systemNode = new PromptNode('system')
+const userNode = new PromptNode('user')
+
+systemNode.content('System message')
+userNode.content('User message')
+
+builder.nodes.push(systemNode, userNode)
+const result = builder.build()
 ```
 
 **Output:**
@@ -66,8 +69,9 @@ class PromptNode {
 
 **Example:**
 ```typescript
-const node = prompt.system
-  .role('assistant', 'A helpful AI')
+const node = new PromptNode('system')
+node
+  .setRole('assistant', 'A helpful AI')
   .content('Help with {{topic}}')
   .var('topic', 'programming')
   .important('Be clear and concise')
@@ -103,7 +107,8 @@ class BranchBuilder {
 
 **Example:**
 ```typescript
-const branch = prompt.system
+const node = new PromptNode('system')
+const branch = node
   .branch('userType')
   .case('admin', 'Full access')
   .case('user', 'Limited access')
@@ -252,15 +257,19 @@ interface ToolFunction {
 ### Basic Prompt Building
 
 ```typescript
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
-const prompt = P()
-  .system
-  .role('assistant', 'A helpful AI')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('assistant', 'A helpful AI')
   .content('You help with {{topic}}')
   .var('topic', 'programming')
   .important('Be clear and concise')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 
 console.log(prompt)
 ```

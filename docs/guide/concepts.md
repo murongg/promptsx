@@ -9,23 +9,32 @@ PromptX is built around several core concepts that work together to create flexi
 The main entry point for creating prompts with system, user, and assistant messages.
 
 ```typescript
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
-const prompt = P()
-  .system
-  .content('System instructions')
-  .user
-  .content('User request')
-  .assistant
-  .content('Assistant response')
+const builder = P()
+
+const systemNode = new PromptNode('system')
+systemNode.content('System instructions')
+
+const userNode = new PromptNode('user')
+userNode.content('User request')
+
+const assistantNode = new PromptNode('assistant')
+assistantNode.content('Assistant response')
+
+builder.nodes.push(systemNode)
+builder.nodes.push(userNode)
+builder.nodes.push(assistantNode)
 ```
 
 **Output:**
 ```typescript
 PromptBuilder {
-  system: PromptNode { _role: 'system', ... },
-  user: PromptNode { _role: 'user', ... },
-  assistant: PromptNode { _role: 'assistant', ... }
+  nodes: [
+    PromptNode { _role: 'system', ... },
+    PromptNode { _role: 'user', ... },
+    PromptNode { _role: 'assistant', ... }
+  ]
 }
 ```
 
@@ -34,8 +43,9 @@ PromptBuilder {
 Each role (system, user, assistant) is a `PromptNode` with methods for content management.
 
 ```typescript
-prompt.system
-  .role('name', 'description')
+const systemNode = new PromptNode('system')
+systemNode
+  .setRole('name', 'description')
   .content('Main content')
   .important('Important requirements')
   .critical('Critical requirements')
@@ -61,13 +71,14 @@ PromptNode {
 Use `{{variable}}` syntax for dynamic content:
 
 ```typescript
-prompt.system
+const systemNode = new PromptNode('system')
+systemNode
   .content('Hello {{name}}!')
   .var('name', 'World')
   .content('Welcome to {{platform}}')
   .var('platform', 'PromptX')
 
-const result = prompt.system.build()
+const result = systemNode.build()
 ```
 
 **Output:**
@@ -91,11 +102,12 @@ Welcome to PromptX
 Use `when()` for IF/THEN/ELSE statements:
 
 ```typescript
-prompt.system
+const systemNode = new PromptNode('system')
+systemNode
   .when('isProduction', 'Use production config', 'Use development config')
   .when('hasAuth', 'Require authentication', 'Allow anonymous access')
 
-const result = prompt.system.build()
+const result = systemNode.build()
 ```
 
 **Output:**
@@ -128,14 +140,15 @@ END IF
 Use `branch()` for SWITCH/CASE statements:
 
 ```typescript
-prompt.system
+const systemNode = new PromptNode('system')
+systemNode
   .branch('userType')
   .case('admin', 'Full access with audit logging')
   .case('user', 'Limited access with restrictions')
   .case('guest', 'Read-only access only')
   .default('No access - request permissions')
 
-const result = prompt.system.build()
+const result = systemNode.build()
 ```
 
 **Output:**
@@ -160,12 +173,13 @@ END SWITCH
 Structured content with semantic blocks:
 
 ```typescript
-prompt.system
+const systemNode = new PromptNode('system')
+systemNode
   .important(['Requirement 1', 'Requirement 2', 'Requirement 3'])
   .critical(['Critical requirement 1', 'Critical requirement 2'])
   .examples(['Example 1', 'Example 2', 'Example 3'])
 
-const result = prompt.system.build()
+const result = systemNode.build()
 ```
 
 **Output:**

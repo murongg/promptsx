@@ -24,14 +24,18 @@ Use descriptive variable names that clearly indicate their purpose:
 
 **Example with Good Naming:**
 ```typescript
-const prompt = P()
-  .system
-  .role('code-reviewer', 'An experienced code reviewer')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('code-reviewer', 'An experienced code reviewer')
   .content('Review {{programmingLanguage}} code for {{projectType}} project')
   .var('programmingLanguage', 'TypeScript')
   .var('projectType', 'production')
   .when('isProductionEnvironment', 'Focus on security and performance', 'Focus on learning')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 ```
 
 **Output:**
@@ -61,8 +65,9 @@ END IF
 Structure your content logically with clear sections:
 
 ```typescript
-prompt.system
-  .role('role-name', 'Clear role description')
+const systemNode = new PromptNode('system')
+systemNode
+  .setRole('role-name', 'Clear role description')
   .content('Main instructions and context')
   .important('Key requirements that must be followed')
   .critical('Critical constraints or safety requirements')
@@ -71,9 +76,11 @@ prompt.system
 
 **Example:**
 ```typescript
-const prompt = P()
-  .system
-  .role('data-analyst', 'A professional data analyst')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('data-analyst', 'A professional data analyst')
   .content('Analyze {{dataType}} data and provide insights')
   .var('dataType', 'user behavior')
   .important([
@@ -87,7 +94,9 @@ const prompt = P()
     'Validate all assumptions'
   ])
   .example('// Example: Time series analysis with seasonal decomposition')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 ```
 
 **Output:**
@@ -128,9 +137,11 @@ Use `when()` for simple conditions and `branch()` for complex scenarios:
 
 **Example:**
 ```typescript
-const prompt = P()
-  .system
-  .role('security-advisor', 'A cybersecurity expert')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('security-advisor', 'A cybersecurity expert')
   .content('Provide security recommendations for {{systemType}}')
   .var('systemType', 'web application')
   .when('isProduction', 'Focus on production security measures', 'Focus on development security practices')
@@ -140,7 +151,9 @@ const prompt = P()
   .case('high', 'Implement comprehensive security with advanced threat detection')
   .default('Implement standard security baseline')
   .important('Always consider the principle of least privilege')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 ```
 
 **Output:**
@@ -220,14 +233,18 @@ const analysisTools = new ToolBuilder()
     'Ensure data privacy and security compliance'
   ])
 
-const prompt = P()
-  .system
-  .role('performance-analyst', 'A system performance analyst')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('performance-analyst', 'A system performance analyst')
   .content('Analyze system performance using available tools')
   .tool(analysisTools)
   .important('Use tools appropriately and provide clear explanations')
   .critical('Never expose sensitive system information')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 ```
 
 **Output:**
@@ -271,7 +288,8 @@ Never expose sensitive system information
 Set variables once and reuse them throughout the prompt:
 
 ```typescript
-prompt.system
+const systemNode = new PromptNode('system')
+systemNode
   .var('language', 'TypeScript')
   .var('framework', 'React')
   .content('You are a {{language}} expert')
@@ -282,9 +300,11 @@ prompt.system
 
 **Example:**
 ```typescript
-const prompt = P()
-  .system
-  .role('frontend-developer', 'A frontend development expert')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('frontend-developer', 'A frontend development expert')
   .var('programmingLanguage', 'TypeScript')
   .var('frontendFramework', 'React')
   .var('projectType', 'single-page application')
@@ -295,7 +315,9 @@ const prompt = P()
     'Implement responsive design for {{projectType}}'
   ])
   .when('is{{frontendFramework}}Project', 'Focus on {{frontendFramework}}-specific patterns', 'Use general frontend patterns')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 ```
 
 **Output:**
@@ -327,29 +349,36 @@ END IF
 Always test your prompts to ensure they generate the expected output:
 
 ```typescript
-const prompt = P()
-  .system
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
   .content('Test content')
   .var('testVar', 'test value')
 
-const result = prompt.build()
+builder.nodes.push(systemNode)
+const result = builder.build()
 console.log(result) // Verify output structure and content
 ```
 
 **Example:**
 ```typescript
 // Test a complex prompt
-const testPrompt = P()
-  .system
-  .role('tester', 'A testing expert')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('tester', 'A testing expert')
   .content('Test {{feature}} functionality')
   .var('feature', 'user authentication')
   .when('isProduction', 'Use production test data', 'Use mock data')
   .important('Ensure comprehensive coverage')
-  .build()
 
-console.log('Prompt structure:', testPrompt.system.build())
-console.log('Full prompt:', testPrompt.build())
+builder.nodes.push(systemNode)
+const prompt = builder.build()
+
+console.log('Prompt structure:', systemNode.build())
+console.log('Full prompt:', prompt)
 ```
 
 **Output:**
@@ -425,7 +454,7 @@ const templateSection = branches('templateType', [
 
 **Example:**
 ```typescript
-import { block, branches, importants, when } from '@promptsx/core'
+import { P, PromptNode, block, branches, importants, when } from '@promptsx/core'
 
 function createAnalysisPrompt(analysisType: string, dataSource: string) {
   const environmentLogic = when('isProduction', 'Use production data sources and apply strict validation', 'Use development data and allow experimental approaches')
@@ -489,33 +518,38 @@ END SWITCH
 Mix builder pattern with direct functions for maximum flexibility:
 
 ```typescript
-const prompt = P()
+const builder = P()
+const systemNode = new PromptNode('system')
 
-prompt.system
-  .role('assistant', 'A helpful assistant')
+systemNode
+  .setRole('assistant', 'A helpful assistant')
   .content('Base instructions')
   .content(when('isAdvanced', 'Use advanced techniques', 'Use basic techniques'))
   .content(block('special_notes', 'Important considerations'))
 
-const result = prompt.build()
+builder.nodes.push(systemNode)
+const result = builder.build()
 ```
 
 **Example:**
 ```typescript
-import { block, importants, when } from '@promptsx/core'
+import { P, PromptNode, block, importants, when } from '@promptsx/core'
 
-const prompt = P()
+const builder = P()
+const systemNode = new PromptNode('system')
 
-prompt.system
-  .role('code-assistant', 'A helpful coding assistant')
+systemNode
+  .setRole('code-assistant', 'A helpful coding assistant')
   .content('Help with {{language}} programming')
   .var('language', 'Python')
   .content(when('isBeginner', 'Use simple examples and explanations', 'Use advanced patterns and best practices'))
   .content(block('learning_objectives', 'Focus on practical application and real-world usage'))
   .important(importants(['Provide working code examples', 'Explain key concepts clearly']))
-  .build()
 
-const result = prompt.build()
+builder.nodes.push(systemNode)
+const prompt = builder.build()
+
+const result = prompt
 ```
 
 **Output:**
@@ -542,9 +576,11 @@ Focus on practical application and real-world usage
 Always consider error cases and edge conditions:
 
 ```typescript
-const prompt = P()
-  .system
-  .role('error-handler', 'An error handling expert')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('error-handler', 'An error handling expert')
   .content('Handle {{errorType}} errors gracefully')
   .var('errorType', 'network timeout')
   .when('isCritical', 'Implement fallback mechanisms', 'Log and continue')
@@ -554,7 +590,9 @@ const prompt = P()
     'Consider retry mechanisms for transient errors'
   ])
   .critical('Never expose sensitive information in error messages')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 ```
 
 ## 10. Performance Considerations
@@ -564,25 +602,29 @@ For large prompts, consider breaking them into smaller, reusable components:
 ```typescript
 // Create reusable prompt components
 function createRolePrompt(role: string, description: string) {
-  return P()
-    .system
-    .role(role, description)
-    .build()
+  const builder = P()
+  const systemNode = new PromptNode('system')
+  systemNode.setRole(role, description)
+  builder.nodes.push(systemNode)
+  return builder.build()
 }
 
 function createRequirementsPrompt(requirements: string[]) {
-  return P()
-    .system
-    .important(requirements)
-    .build()
+  const builder = P()
+  const systemNode = new PromptNode('system')
+  systemNode.important(requirements)
+  builder.nodes.push(systemNode)
+  return builder.build()
 }
 
 // Combine components
-const mainPrompt = P()
-  .system
+const builder = P()
+const systemNode = new PromptNode('system')
+systemNode
   .content(createRolePrompt('expert', 'An expert in the field'))
   .content(createRequirementsPrompt(['Requirement 1', 'Requirement 2']))
-  .build()
+builder.nodes.push(systemNode)
+const mainPrompt = builder.build()
 ```
 
 ## Next Steps

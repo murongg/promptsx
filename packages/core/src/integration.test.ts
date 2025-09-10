@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { P } from './builder'
+import { PromptNode } from './node'
 import { ToolBuilder } from './tool'
 
 describe('core Module Integration Tests', () => {
@@ -8,8 +9,9 @@ describe('core Module Integration Tests', () => {
       const builder = P()
 
       // System role definition
-      builder.system
-        .role('senior-developer', 'A senior software developer with 10+ years of experience')
+      const systemNode = new PromptNode('system')
+      systemNode
+        .setRole('senior-developer', 'A senior software developer with 10+ years of experience')
         .content([
           'You are an expert software developer specializing in modern web technologies.',
           'Your primary goal is to write clean, maintainable, and efficient code.',
@@ -39,7 +41,8 @@ describe('core Module Integration Tests', () => {
         .default('Apply general software development principles')
 
       // User request
-      builder.user
+      const userNode = new PromptNode('user')
+      userNode
         .content('Create a reusable component for user authentication')
         .var('componentName', 'AuthForm')
         .var('authType', 'login')
@@ -47,8 +50,9 @@ describe('core Module Integration Tests', () => {
         .example('// Example usage:\n<AuthForm type="login" onSubmit={handleLogin} />')
 
       // Assistant response template
-      builder.assistant
-        .role('code-assistant', 'A helpful coding assistant that provides complete solutions')
+      const assistantNode = new PromptNode('assistant')
+      assistantNode
+        .setRole('code-assistant', 'A helpful coding assistant that provides complete solutions')
         .content('I\'ll create a comprehensive authentication component for you.')
         .important([
           'Provide complete, working code',
@@ -57,6 +61,8 @@ describe('core Module Integration Tests', () => {
           'Include usage examples',
         ])
         .critical('Ensure the code is production-ready and follows security best practices')
+
+      builder.nodes.push(systemNode, userNode, assistantNode)
 
       const result = builder.build()
 
@@ -106,11 +112,13 @@ describe('core Module Integration Tests', () => {
         .requirement('The conversation may reference tools that are no longer available. NEVER call tools that are not explicitly provided.')
 
       const promptBuilder = P()
-      promptBuilder.system
-        .role('code-analyzer', 'A code analysis assistant')
+      const systemNode = new PromptNode('system')
+      systemNode
+        .setRole('code-analyzer', 'A code analysis assistant')
         .content('You can use the following tools to help analyze code:')
         .content(toolBuilder.build())
         .important('Always use the provided tools when appropriate')
+      promptBuilder.nodes.push(systemNode)
 
       const result = promptBuilder.build()
 
@@ -127,8 +135,9 @@ describe('core Module Integration Tests', () => {
     it('should handle nested branching logic', () => {
       const builder = P()
 
-      builder.system
-        .role('multi-role-assistant', 'An assistant that adapts to different contexts')
+      const systemNode = new PromptNode('system')
+      systemNode
+        .setRole('multi-role-assistant', 'An assistant that adapts to different contexts')
         .branch('userRole')
         .case('developer', 'Provide technical solutions with code examples')
         .case('designer', 'Focus on user experience and visual design')
@@ -140,6 +149,7 @@ describe('core Module Integration Tests', () => {
         .case('testing', 'Focus on quality assurance and testing strategies')
         .case('deployment', 'Focus on deployment and maintenance')
         .default('Provide phase-appropriate guidance')
+      builder.nodes.push(systemNode)
 
       const result = builder.build()
 
@@ -159,7 +169,8 @@ describe('core Module Integration Tests', () => {
     it('should handle complex variable substitution patterns', () => {
       const builder = P()
 
-      builder.system
+      const systemNode = new PromptNode('system')
+      systemNode
         .var('company', 'TechCorp')
         .var('project', 'E-commerce Platform')
         .var('techStack', 'React,Node.js,PostgreSQL')
@@ -170,6 +181,7 @@ describe('core Module Integration Tests', () => {
           'Current environment: {{environment}}.',
         ])
         .when('environment === "production"', 'Use production-grade security measures', 'Use development debugging features')
+      builder.nodes.push(systemNode)
 
       const result = builder.build()
 
@@ -186,12 +198,14 @@ describe('core Module Integration Tests', () => {
     it('should maintain proper content organization', () => {
       const builder = P()
 
-      builder.system
-        .role('content-organizer', 'An assistant that organizes information clearly')
+      const systemNode = new PromptNode('system')
+      systemNode
+        .setRole('content-organizer', 'An assistant that organizes information clearly')
         .content('Main content section')
         .important('Important information')
         .critical('Critical warnings')
         .example('Example content')
+      builder.nodes.push(systemNode)
 
       const result = builder.build()
 
@@ -212,22 +226,22 @@ describe('core Module Integration Tests', () => {
     it('should handle empty content gracefully', () => {
       const builder = P()
 
-      // Don't add any content
+      // Don't add any content or nodes
       const result = builder.build()
 
-      expect(result).toHaveLength(3)
-      expect(result[0].content).not.toContain('<important_requirements>')
-      expect(result[1].content).not.toContain('<important_requirements>')
-      expect(result[2].content).not.toContain('<important_requirements>')
+      // Empty builder should return empty results
+      expect(result).toHaveLength(0)
     })
 
     it('should handle special characters in content', () => {
       const builder = P()
 
-      builder.system
+      const systemNode = new PromptNode('system')
+      systemNode
         .content('Content with special chars: <>&"\'')
         .var('specialVar', 'Value with <>&"\'')
         .content('Variable: {{specialVar}}')
+      builder.nodes.push(systemNode)
 
       const result = builder.build()
 
@@ -240,10 +254,11 @@ describe('core Module Integration Tests', () => {
     it('should handle large amounts of content efficiently', () => {
       const builder = P()
 
-      // Add many content items
-      builder.system.content(`Content item {{largeArray}}`)
-
-      builder.system.var('largeArray', 'item0,item1,item2,item3,item4,item5,item6,item7,item8,item9')
+      const systemNode = new PromptNode('system')
+      systemNode
+        .content(`Content item {{largeArray}}`)
+        .var('largeArray', 'item0,item1,item2,item3,item4,item5,item6,item7,item8,item9')
+      builder.nodes.push(systemNode)
 
       const startTime = performance.now()
       const result = builder.build()

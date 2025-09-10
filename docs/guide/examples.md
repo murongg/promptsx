@@ -9,13 +9,17 @@ This page provides practical examples of PromptX usage, from basic to advanced s
 ### Simple System Message
 
 ```typescript
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
-const prompt = P()
-  .system
-  .role('assistant', 'A helpful AI assistant')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('assistant', 'A helpful AI assistant')
   .content('You help users with their questions')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 
 console.log(prompt)
 ```
@@ -34,12 +38,16 @@ You help users with their questions`
 ### User Message with Variables
 
 ```typescript
-const prompt = P()
-  .user
+const builder = P()
+const userNode = new PromptNode('user')
+
+userNode
   .content('Help me with {{topic}}')
   .var('topic', 'JavaScript programming')
   .example('// I need help with async/await')
-  .build()
+
+builder.nodes.push(userNode)
+const prompt = builder.build()
 
 console.log(prompt)
 ```
@@ -61,14 +69,18 @@ console.log(prompt)
 ### Conditional Logic
 
 ```typescript
-const prompt = P()
-  .system
-  .role('code-reviewer', 'An experienced code reviewer')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('code-reviewer', 'An experienced code reviewer')
   .content('Review the following code')
   .when('isProduction', 'Focus on security and performance', 'Focus on learning and best practices')
   .when('isLegacy', 'Suggest modernization approaches', 'Suggest optimization techniques')
   .important('Always provide actionable feedback')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 
 console.log(prompt)
 ```
@@ -103,9 +115,11 @@ END IF
 ### Branching Logic
 
 ```typescript
-const prompt = P()
-  .system
-  .role('project-manager', 'A project management expert')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('project-manager', 'A project management expert')
   .content('Help manage {{projectType}} project')
   .var('projectType', 'software development')
   .branch('projectPhase')
@@ -115,7 +129,9 @@ const prompt = P()
   .case('deployment', 'Focus on rollout and monitoring')
   .default('Provide general guidance')
   .important(['Track progress', 'Manage risks'])
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 
 console.log(prompt)
 ```
@@ -173,15 +189,19 @@ const tools = new ToolBuilder()
     'Always validate input parameters before calling tools'
   ])
 
-const prompt = P()
-  .system
-  .role('code-analyzer', 'A code analysis assistant')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('code-analyzer', 'A code analysis assistant')
   .content('You have access to advanced code analysis tools')
   .tool(tools)
   .when('isComplex', 'Use detailed analysis tools', 'Use basic analysis tools')
   .important(['Use tools appropriately', 'Provide clear explanations'])
   .critical('Never expose sensitive information')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 
 console.log(prompt)
 ```
@@ -231,11 +251,12 @@ Never expose sensitive information
 ### Complex Multi-Node Prompt
 
 ```typescript
-const complexPrompt = P()
+const builder = P()
 
 // System message with all features
-complexPrompt.system
-  .role('ai-expert', 'An AI expert with deep knowledge')
+const systemNode = new PromptNode('system')
+systemNode
+  .setRole('ai-expert', 'An AI expert with deep knowledge')
   .content('You help with {{domain}} problems')
   .var('domain', 'machine learning')
   .when('isAdvanced', 'Use advanced concepts and techniques', 'Use fundamental concepts')
@@ -254,13 +275,16 @@ complexPrompt.system
   .example('// Example: Implementing a simple classifier')
 
 // User message with context
-complexPrompt.user
+const userNode = new PromptNode('user')
+userNode
   .content('I need help with {{specificProblem}}')
   .var('specificProblem', 'implementing a neural network')
   .important('I am a beginner in this field')
   .example('// I want to build a simple neural network for image classification')
 
-const result = complexPrompt.build()
+builder.nodes.push(systemNode)
+builder.nodes.push(userNode)
+const result = builder.build()
 ```
 
 **Output:**
@@ -318,10 +342,11 @@ Never provide incorrect or harmful information
 ### Code Review Assistant
 
 ```typescript
-const codeReviewPrompt = P()
+const builder = P()
 
-codeReviewPrompt.system
-  .role('code-reviewer', 'An experienced code reviewer')
+const systemNode = new PromptNode('system')
+systemNode
+  .setRole('code-reviewer', 'An experienced code reviewer')
   .content('Review the following {{language}} code for:')
   .var('language', 'TypeScript')
   .important([
@@ -333,12 +358,15 @@ codeReviewPrompt.system
   .critical('Always provide specific examples and suggestions')
   .when('isProduction', 'Focus on security and performance', 'Focus on learning and best practices')
 
-codeReviewPrompt.user
+const userNode = new PromptNode('user')
+userNode
   .content('Review this code:\n```typescript\n{{code}}\n```')
   .var('code', 'function processData(data: any) { return data.process() }')
   .example('// I need feedback on this function')
 
-const result = codeReviewPrompt.build()
+builder.nodes.push(systemNode)
+builder.nodes.push(userNode)
+const result = builder.build()
 ```
 
 **Output:**
@@ -380,10 +408,11 @@ function processData(data: any) { return data.process() }
 ### Content Management System
 
 ```typescript
-const contentPrompt = P()
+const builder = P()
 
-contentPrompt.system
-  .role('content-manager', 'A content management specialist')
+const systemNode = new PromptNode('system')
+systemNode
+  .setRole('content-manager', 'A content management specialist')
   .content('You help manage and organize content for {{platform}}')
   .var('platform', 'web application')
   .when('hasSEO', 'Optimize for search engines', 'Focus on user engagement')
@@ -399,13 +428,16 @@ contentPrompt.system
   ])
   .critical('Never publish content without proper review')
 
-contentPrompt.user
+const userNode = new PromptNode('user')
+userNode
   .content('Help me create {{contentType}} content about {{topic}}')
   .var('contentType', 'blog post')
   .var('topic', 'AI development')
   .example('// I need engaging content that explains AI concepts simply')
 
-const result = contentPrompt.build()
+builder.nodes.push(systemNode)
+builder.nodes.push(userNode)
+const result = builder.build()
 ```
 
 **Output:**

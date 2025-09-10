@@ -1,4 +1,4 @@
-import { PromptNode } from './node'
+import type { PromptNode } from './node'
 
 export interface ChatMessage {
   role: 'system' | 'user' | 'assistant'
@@ -6,24 +6,18 @@ export interface ChatMessage {
 }
 
 export class PromptBuilder {
-  public system: PromptNode = new PromptNode('system')
-  public user: PromptNode = new PromptNode('user')
-  public assistant: PromptNode = new PromptNode('assistant')
+  public nodes: PromptNode[] = []
 
   build(): ChatMessage[] {
-    const system = this.system.build()
-    const user = this.user.build()
-    const assistant = this.assistant.build()
     const res: ChatMessage[] = []
-    if (system) {
-      res.push({ role: 'system', content: system })
-    }
-    if (user) {
-      res.push({ role: 'user', content: user })
-    }
-    if (assistant) {
-      res.push({ role: 'assistant', content: assistant })
-    }
+
+    this.nodes.forEach((node) => {
+      const content = node.build()
+      if (content) {
+        res.push({ role: node.role, content })
+      }
+    })
+
     return res
   }
 }

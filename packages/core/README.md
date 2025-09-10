@@ -46,14 +46,18 @@ yarn add @promptsx/core
 ## 🎯 Quick Start
 
 ```typescript
-import { P } from '@promptsx/core'
+import { P, PromptNode } from '@promptsx/core'
 
-const prompt = P()
-  .system
-  .role('code-assistant', 'A helpful coding assistant')
+const builder = P()
+const systemNode = new PromptNode('system')
+
+systemNode
+  .setRole('code-assistant', 'A helpful coding assistant')
   .content('You are an expert developer')
   .important('Always provide working code examples')
-  .build()
+
+builder.nodes.push(systemNode)
+const prompt = builder.build()
 
 console.log(prompt)
 ```

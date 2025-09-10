@@ -9,9 +9,9 @@ describe('promptNode', () => {
     node = new PromptNode('system')
   })
 
-  describe('role()', () => {
+  describe('setRole()', () => {
     it('should set role and return this for chaining', () => {
-      const result = node.role('developer', 'A software developer')
+      const result = node.setRole('developer', 'A software developer')
       expect(result).toBe(node)
 
       const output = node.build()
@@ -19,8 +19,8 @@ describe('promptNode', () => {
     })
 
     it('should overwrite existing role', () => {
-      node.role('developer', 'A software developer')
-      node.role('designer', 'A UI designer')
+      node.setRole('developer', 'A software developer')
+      node.setRole('designer', 'A UI designer')
 
       const output = node.build()
       expect(output).toContain('A UI designer')
@@ -214,7 +214,7 @@ describe('promptNode', () => {
     })
 
     it('should build node with role information', () => {
-      node.role('developer', 'A software developer')
+      node.setRole('developer', 'A software developer')
       const result = node.build()
 
       expect(result).toContain('A software developer')
@@ -287,7 +287,7 @@ describe('promptNode', () => {
 
     it('should build complete node with all components', () => {
       node
-        .role('developer', 'A software developer')
+        .setRole('developer', 'A software developer')
         .content('Write clean code')
         .important('Follow best practices')
         .critical('No bugs allowed')
