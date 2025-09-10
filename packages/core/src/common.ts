@@ -38,7 +38,7 @@ export function when(conditionVar: string, trueText: string, falseText?: string)
 export function importants(text: string[]): string {
   if (!text || text.length === 0)
     return ''
-  const str = text.join('\n - ')
+  const str = ` - ${text.join('\n - ')}`
   return block('important_requirements', str)
 }
 
@@ -49,7 +49,7 @@ export function importants(text: string[]): string {
 export function criticals(text: string[]): string {
   if (!text || text.length === 0)
     return ''
-  const str = text.join('\n - ')
+  const str = ` - ${text.join('\n - ')}`
   return block('critical_requirements', str)
 }
 
@@ -60,7 +60,7 @@ export function criticals(text: string[]): string {
 export function examples(text: string[]): string {
   if (!text || text.length === 0)
     return ''
-  const str = text.join('\n - ')
+  const str = ` - ${text.join('\n - ')}`
   return block('examples', str)
 }
 
@@ -96,7 +96,7 @@ export function tools(tools: ToolFunction[], requirements?: string[]): string {
   </function>`).join('\n')
     : ''
 
-  const requirementsText = requirements && requirements.length > 0 ? `${block('tool_calling', requirements.join('\n - '))}\n` : ''
+  const requirementsText = requirements && requirements.length > 0 ? `${block('tool_calling', ` - ${requirements.join('\n - ')}`)}\n` : ''
 
   if (!functionText && !requirementsText)
     return ''
