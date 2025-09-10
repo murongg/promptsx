@@ -8,6 +8,15 @@ export interface ChatMessage {
 export class PromptBuilder {
   public nodes: PromptNode[] = []
 
+  /**
+   * @param node - The PromptNode to add to the builder
+   * @returns The prompt builder for chaining
+   */
+  node(node: PromptNode): this {
+    this.nodes.push(node)
+    return this
+  }
+
   build(): ChatMessage[] {
     const res: ChatMessage[] = []
 

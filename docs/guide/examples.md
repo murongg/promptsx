@@ -11,15 +11,15 @@ This page provides practical examples of PromptX usage, from basic to advanced s
 ```typescript
 import { P, PromptNode } from '@promptsx/core'
 
-const builder = P()
 const systemNode = new PromptNode('system')
 
 systemNode
   .setRole('assistant', 'A helpful AI assistant')
   .content('You help users with their questions')
 
-builder.nodes.push(systemNode)
-const prompt = builder.build()
+const prompt = P()
+  .node(systemNode)
+  .build()
 
 console.log(prompt)
 ```
@@ -38,7 +38,6 @@ You help users with their questions`
 ### User Message with Variables
 
 ```typescript
-const builder = P()
 const userNode = new PromptNode('user')
 
 userNode
@@ -46,8 +45,9 @@ userNode
   .var('topic', 'JavaScript programming')
   .example('// I need help with async/await')
 
-builder.nodes.push(userNode)
-const prompt = builder.build()
+const prompt = P()
+  .node(userNode)
+  .build()
 
 console.log(prompt)
 ```
@@ -69,7 +69,6 @@ console.log(prompt)
 ### Conditional Logic
 
 ```typescript
-const builder = P()
 const systemNode = new PromptNode('system')
 
 systemNode
@@ -79,8 +78,9 @@ systemNode
   .when('isLegacy', 'Suggest modernization approaches', 'Suggest optimization techniques')
   .important('Always provide actionable feedback')
 
-builder.nodes.push(systemNode)
-const prompt = builder.build()
+const prompt = P()
+  .node(systemNode)
+  .build()
 
 console.log(prompt)
 ```
@@ -115,7 +115,6 @@ END IF
 ### Branching Logic
 
 ```typescript
-const builder = P()
 const systemNode = new PromptNode('system')
 
 systemNode
@@ -130,8 +129,9 @@ systemNode
   .default('Provide general guidance')
   .important(['Track progress', 'Manage risks'])
 
-builder.nodes.push(systemNode)
-const prompt = builder.build()
+const prompt = P()
+  .node(systemNode)
+  .build()
 
 console.log(prompt)
 ```
@@ -189,7 +189,6 @@ const tools = new ToolBuilder()
     'Always validate input parameters before calling tools'
   ])
 
-const builder = P()
 const systemNode = new PromptNode('system')
 
 systemNode
@@ -200,8 +199,9 @@ systemNode
   .important(['Use tools appropriately', 'Provide clear explanations'])
   .critical('Never expose sensitive information')
 
-builder.nodes.push(systemNode)
-const prompt = builder.build()
+const prompt = P()
+  .node(systemNode)
+  .build()
 
 console.log(prompt)
 ```
@@ -251,8 +251,6 @@ Never expose sensitive information
 ### Complex Multi-Node Prompt
 
 ```typescript
-const builder = P()
-
 // System message with all features
 const systemNode = new PromptNode('system')
 systemNode
@@ -282,9 +280,10 @@ userNode
   .important('I am a beginner in this field')
   .example('// I want to build a simple neural network for image classification')
 
-builder.nodes.push(systemNode)
-builder.nodes.push(userNode)
-const result = builder.build()
+const result = P()
+  .node(systemNode)
+  .node(userNode)
+  .build()
 ```
 
 **Output:**
@@ -342,8 +341,6 @@ Never provide incorrect or harmful information
 ### Code Review Assistant
 
 ```typescript
-const builder = P()
-
 const systemNode = new PromptNode('system')
 systemNode
   .setRole('code-reviewer', 'An experienced code reviewer')
@@ -364,9 +361,10 @@ userNode
   .var('code', 'function processData(data: any) { return data.process() }')
   .example('// I need feedback on this function')
 
-builder.nodes.push(systemNode)
-builder.nodes.push(userNode)
-const result = builder.build()
+const result = P()
+  .node(systemNode)
+  .node(userNode)
+  .build()
 ```
 
 **Output:**
@@ -408,8 +406,6 @@ function processData(data: any) { return data.process() }
 ### Content Management System
 
 ```typescript
-const builder = P()
-
 const systemNode = new PromptNode('system')
 systemNode
   .setRole('content-manager', 'A content management specialist')
@@ -435,9 +431,10 @@ userNode
   .var('topic', 'AI development')
   .example('// I need engaging content that explains AI concepts simply')
 
-builder.nodes.push(systemNode)
-builder.nodes.push(userNode)
-const result = builder.build()
+const result = P()
+  .node(systemNode)
+  .node(userNode)
+  .build()
 ```
 
 **Output:**

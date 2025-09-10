@@ -14,6 +14,7 @@ The main class for building prompts with multiple nodes of different roles.
 class PromptBuilder {
   public nodes: PromptNode[]
 
+  node(node: PromptNode): this
   build(): ChatMessage[]
 }
 ```
@@ -22,15 +23,16 @@ class PromptBuilder {
 ```typescript
 import { P, PromptNode } from '@promptsx/core'
 
-const builder = P()
 const systemNode = new PromptNode('system')
 const userNode = new PromptNode('user')
 
 systemNode.content('System message')
 userNode.content('User message')
 
-builder.nodes.push(systemNode, userNode)
-const result = builder.build()
+const result = P()
+  .node(systemNode)
+  .node(userNode)
+  .build()
 ```
 
 **Output:**
@@ -178,9 +180,7 @@ const result = tools.build()
 
 | Method | Description | Returns |
 |--------|-------------|---------|
-| `system` | Access system message node | `PromptNode` |
-| `user` | Access user message node | `PromptNode` |
-| `assistant` | Access assistant message node | `PromptNode` |
+| `node(node)` | Add a PromptNode to the builder | `this` |
 | `build()` | Build final prompt messages | `ChatMessage[]` |
 
 ### PromptNode Methods
@@ -268,8 +268,9 @@ systemNode
   .var('topic', 'programming')
   .important('Be clear and concise')
 
-builder.nodes.push(systemNode)
-const prompt = builder.build()
+const prompt = P()
+  .node(systemNode)
+  .build()
 
 console.log(prompt)
 ```

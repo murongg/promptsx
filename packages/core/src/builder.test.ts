@@ -15,6 +15,52 @@ describe('promptBuilder', () => {
     })
   })
 
+  describe('node()', () => {
+    it('should add a single node and return builder for chaining', () => {
+      const systemNode = new PromptNode('system')
+      systemNode.content('Test content')
+
+      const result = builder.node(systemNode)
+
+      expect(result).toBe(builder) // Should return this for chaining
+      expect(builder.nodes).toHaveLength(1)
+      expect(builder.nodes[0]).toBe(systemNode)
+    })
+
+    it('should add multiple nodes in sequence', () => {
+      const systemNode = new PromptNode('system')
+      const userNode = new PromptNode('user')
+
+      systemNode.content('System message')
+      userNode.content('User message')
+
+      builder.node(systemNode).node(userNode)
+
+      expect(builder.nodes).toHaveLength(2)
+      expect(builder.nodes[0]).toBe(systemNode)
+      expect(builder.nodes[1]).toBe(userNode)
+    })
+
+    it('should maintain insertion order when adding nodes', () => {
+      const node1 = new PromptNode('assistant')
+      const node2 = new PromptNode('system')
+      const node3 = new PromptNode('user')
+
+      node1.content('First')
+      node2.content('Second')
+      node3.content('Third')
+
+      builder.node(node1).node(node2).node(node3)
+
+      const result = builder.build()
+
+      expect(result).toHaveLength(3)
+      expect(result[0].role).toBe('assistant')
+      expect(result[1].role).toBe('system')
+      expect(result[2].role).toBe('user')
+    })
+  })
+
   describe('build()', () => {
     it('should build empty chat messages', () => {
       const result = builder.build()
@@ -142,6 +188,25 @@ describe('promptBuilder', () => {
 
       expect(builder1).toBeInstanceOf(PromptBuilder)
       expect(builder2).toBeInstanceOf(PromptBuilder)
+    })
+
+    it('should work with node() method for chaining', () => {
+      const systemNode = new PromptNode('system')
+      const userNode = new PromptNode('user')
+
+      systemNode.content('System message')
+      userNode.content('User message')
+
+      const result = P()
+        .node(systemNode)
+        .node(userNode)
+        .build()
+
+      expect(result).toHaveLength(2)
+      expect(result[0].role).toBe('system')
+      expect(result[0].content).toContain('System message')
+      expect(result[1].role).toBe('user')
+      expect(result[1].content).toContain('User message')
     })
 
     it('should create independent instances', () => {
